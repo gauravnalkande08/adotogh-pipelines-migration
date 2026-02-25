@@ -1,0 +1,72 @@
+# Environment variables defined in a calling workflow are not accessible to this reusable workflow. Refer to the documentation for further details on this limitation.
+name: templates_CI_Build_template
+on:
+  workflow_call:
+    inputs:
+      Buildtype:
+        required: false
+        type: string
+jobs:
+  ScanningCredential:
+    name: ScanningCredential
+    runs-on:
+      - self-hosted
+      - "${{ env.Windows_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Setup for Scanning Credential/Token/Secret"
+      shell: powershell
+  sonarqube:
+    name: Prepare Analysis on SonarQube
+    runs-on:
+      - self-hosted
+      - "${{ env.Linux_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Setup for Code Analysis"
+      shell: powershell
+  NexusIQ:
+    name: NexusIQ
+    runs-on:
+      - self-hosted
+      - "${{ env.Linux_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Setup for SCA & SAST Scan"
+      shell: powershell
+  templates_Build_Publish_Apps_template-BuildOnWindows:
+    runs-on:
+      - self-hosted
+      - "${{ env.windows_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Build the Application On windows"
+      shell: powershell
+    env:
+      Buildtype: "${{ inputs.Buildtype }}"
+  templates_Build_Publish_Apps_template-BuildOnLinux:
+    runs-on:
+      - self-hosted
+      - "${{ env.linux_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Build the Application On Linux"
+      shell: powershell
+    env:
+      Buildtype: "${{ inputs.Buildtype }}"
+  templates_Build_Publish_Apps_template-BuildOnMac:
+    runs-on:
+      - self-hosted
+      - "${{ env.mac_pool }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: write-host "Build the Application On Mac"
+      shell: powershell
+    env:
+      Buildtype: "${{ inputs.Buildtype }}"
