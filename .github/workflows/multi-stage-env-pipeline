@@ -1,0 +1,40 @@
+name: DevSecOps1/multi-stage-env-pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      buildtype:
+        description: Application build type (default is release)
+        default: debug
+        type: string
+        required: false
+env:
+  Linux_pool: Azure Pipelines
+  NETVersion: 4.8.1
+  System_Debug: 'true'
+  Windows_pool: Azure Pipelines
+  mac_pool: Azure Pipelines
+  onMainBranch: "${{ eq(variables['Build.SourceBranchName'], 'main') }}"
+jobs:
+  templates_CI_Build_template:
+    name: templates_CI_Build_template
+    uses: "./.github/workflows/templates_ci_build_template.yml"
+    with:
+      Buildtype: "${{ env.buildtype }}"
+  templates_CD_Deploy_template:
+    name: templates_CD_Deploy_template
+    uses: "./.github/workflows/templates_cd_deploy_template.yml"
+    with:
+      env: dev
+      condition: succeeded()
+  templates_CD_Deploy_template_2:
+    name: templates_CD_Deploy_template_2
+    uses: "./.github/workflows/templates_cd_deploy_template.yml"
+    with:
+      env: test
+      condition: succeeded()
+  templates_CD_Deploy_template_3:
+    name: templates_CD_Deploy_template_3
+    uses: "./.github/workflows/templates_cd_deploy_template.yml"
+    with:
+      env: prod
+      condition: succeeded()
